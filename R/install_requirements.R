@@ -3,7 +3,7 @@ required.packages <-
     "data.table" = TRUE,  "tidyverse" = TRUE, "dtplyr" = TRUE, "devtools" = FALSE,
     "leaflet" = TRUE, "leaflet.minicharts" = TRUE, "plotly" = TRUE, 
     "openxlsx" = FALSE, "scales" = FALSE, "fishmethods" = FALSE, "viridis" = FALSE,
-    "mapview" = FALSE, "DBI" = FALSE, "MonetDB.R" = TRUE, "bsplus" = TRUE) ## TRUE means that the package should be loaded. FALSE that the functions are used without loading the package (by refering ::)
+    "mapview" = FALSE, "DBI" = FALSE, "duckdb" = TRUE, "bsplus" = TRUE) ## TRUE means that the package should be loaded. FALSE that the functions are used without loading the package (by refering ::)
 
 new.packages <- names(required.packages)[!(names(required.packages) %in% installed.packages()[,"Package"])]
 if (length(new.packages) > 0) install.packages(new.packages)

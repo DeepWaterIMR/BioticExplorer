@@ -2,10 +2,10 @@
 
 if(Sys.getenv(c("SERVER_MODE"))=="") {
   dbHost <- "localhost"
-  dbIndexPath <- "~/Desktop/dbIndex.rda"
+  dbIndexPath <- "~/Documents/IMR_biotic_BES_database/dbIndex.rda"
 } else {
   dbHost <- "dbserver"
-  dbIndexPath <- "/data/dbIndex.rda"
+  dbIndexPath <- "/Documents/IMR_biotic_BES_database/dbIndex.rda"
 }
 
 dbFound <- FALSE
@@ -87,8 +87,14 @@ speciesFigureList <- list("Length-weight" = "lwPlot", "Growth" = "laPlot", "Matu
 
 ## Find the database
 
-if(DBI::dbCanConnect(MonetDB.R::MonetDB(), host=dbHost, dbname="bioticexplorer", user="monetdb", password="monetdb")) {
-  con_db <- DBI::dbConnect(MonetDB.R::MonetDB(), host=dbHost, dbname="bioticexplorer", user="monetdb", password="monetdb")
+if("~/Documents/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
+   normalizePath() %>% 
+   duckdb::duckdb(read_only = TRUE) %>% 
+   DBI::dbCanConnect()) {
+  con_db <-"~/Documents/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
+    normalizePath() %>% 
+    duckdb::duckdb(read_only = TRUE) %>% 
+    DBI::dbConnect()
   dbFound <- TRUE
 }
 

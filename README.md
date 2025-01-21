@@ -2,7 +2,7 @@
 # Biotic Explorer
 
 **A Shiny app to explore Biotic data within the Institute of Marine
-Research Norway (IMR) database. Version 0.6.69 (alpha), 2023-03-16.**
+Research Norway (IMR) database. Version 0.7.0, 2025-01-21.**
 
 This is the developmental version of the **Biotic Explorer**
 [Shiny](https://shiny.rstudio.com/) app intended for examination and
@@ -14,8 +14,10 @@ at the IMR.
 <!-- The official, stable, version of the app can be found from their [GitHub site](https://github.com/StoXProject).  -->
 
 The app can be run on a desktop (i.e. your computer) for local files and
-on a [server](http://njord:8080/bioticexplorer/) for both local files
-and the entire IMR Biotic database.
+on a [server](http://njord:8080/bioticexplorer/) and computer for both
+local files and the entire IMR Biotic database after downloading the
+database using
+[BioticExplorerServer](https://github.com/DeepWaterIMR/BioticExplorerServer).
 
 ## The server version
 
@@ -220,10 +222,14 @@ Running the app automatically installs following packages:
   Provides viridis color scale for Leaflet maps.
 - [DBI](https://cran.r-project.org/web/packages/DBI/index.html): Used
   for database operations
-- [MonetDB.R](https://cran.r-project.org/web/packages/MonetDB.R/index.html):
+- [duckdb](https://cran.r-project.org/web/packages/duckdb/index.html):
   The database interface package for the BioticExplorer database
 
 ## News
+
+2025-01-21 Migrated BioticExplorer to
+[DuckDB](https://duckdb.org/docs/api/r.html). The software and database
+should work on all commonly used operating systems now.
 
 2020-05-13 Added complete database support. All features visioned at the
 beginning of the development have now been incorporated. Making the
