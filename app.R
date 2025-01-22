@@ -1,8 +1,18 @@
+### Define operating system
+
+if (Sys.info()["sysname"] == "Windows") {
+  os <- "Win"
+} else if (Sys.info()["sysname"] == "Darwin") {
+  os <- "Mac"
+} else if (Sys.info()["sysname"] == "Linux") {
+  os <- "Linux"
+}
+
 ## Set the database alternative ("local" for locally run MonetDB, "server" for the MonetDB on Eucleia, "desktop" for no database connection)
 
 if(Sys.getenv(c("SERVER_MODE"))=="") {
   dbHost <- "localhost"
-  dbIndexPath <- "~/Documents/IMR_biotic_BES_database/dbIndex.rda"
+  dbIndexPath <- "~/IMR_biotic_BES_database/dbIndex.rda"
 } else {
   dbHost <- "dbserver"
   dbIndexPath <- "/Documents/IMR_biotic_BES_database/dbIndex.rda"
@@ -13,16 +23,6 @@ dbFound <- FALSE
 ## Libraries required to run the app ####
 
 require(shiny)
-
-### Define operating system
-
-if (Sys.info()["sysname"] == "Windows") {
-  os <- "Win"
-} else if (Sys.info()["sysname"] == "Darwin") {
-  os <- "Mac"
-} else if (Sys.info()["sysname"] == "Linux") {
-  os <- "Linux"
-}
 
 ### OS specific exceptions
 
@@ -87,11 +87,11 @@ speciesFigureList <- list("Length-weight" = "lwPlot", "Growth" = "laPlot", "Matu
 
 ## Find the database
 
-if("~/Documents/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
+if("~/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
    normalizePath() %>% 
    duckdb::duckdb(read_only = TRUE) %>% 
    DBI::dbCanConnect()) {
-  con_db <-"~/Documents/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
+  con_db <-"~/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
     normalizePath() %>% 
     duckdb::duckdb(read_only = TRUE) %>% 
     DBI::dbConnect()
