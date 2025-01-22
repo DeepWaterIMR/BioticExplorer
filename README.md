@@ -2,7 +2,7 @@
 # Biotic Explorer
 
 **A Shiny app to explore Biotic data within the Institute of Marine
-Research Norway (IMR) database. Version 0.7.0, 2025-01-21.**
+Research Norway (IMR) database. Version 0.7.1, 2025-01-22.**
 
 This is the developmental version of the **Biotic Explorer**
 [Shiny](https://shiny.rstudio.com/) app intended for examination and
@@ -18,6 +18,9 @@ on a [server](http://njord:8080/bioticexplorer/) and computer for both
 local files and the entire IMR Biotic database after downloading the
 database using
 [BioticExplorerServer](https://github.com/DeepWaterIMR/BioticExplorerServer).
+Note that the server needs to be installed to the [default location
+(`~/IMR_biotic_BES_database`)](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database)
+for BioticExplorer to detect it.
 
 ## The server version
 

@@ -19,7 +19,7 @@ This is the developmental version of the **Biotic Explorer** [Shiny](https://shi
 
 <!-- The official, stable, version of the app can be found from their [GitHub site](https://github.com/StoXProject).  -->
 
-The app can be run on a desktop (i.e. your computer) for local files and on a [server](http://njord:8080/bioticexplorer/) and computer for both local files and the entire IMR Biotic database after downloading the database using [BioticExplorerServer](https://github.com/DeepWaterIMR/BioticExplorerServer).
+The app can be run on a desktop (i.e. your computer) for local files and on a [server](http://njord:8080/bioticexplorer/) and computer for both local files and the entire IMR Biotic database after downloading the database using [BioticExplorerServer](https://github.com/DeepWaterIMR/BioticExplorerServer). Note that the server needs to be installed to the [default location (`~/IMR_biotic_BES_database`)](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database) for BioticExplorer to detect it. 
 
 ## The server version
 
@@ -47,7 +47,6 @@ You may also run the app directly from GitHub, but this will place the files in 
 library(shiny)
 shiny::runGitHub("BioticExplorer", "MikkoVihtakari")
 ```
-
 
 ## Usage
 
