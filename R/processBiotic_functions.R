@@ -23,6 +23,21 @@ processBioticFile <- function(file, removeEmpty = TRUE, convertColumns = TRUE, r
   
   dt <- RstoxData::readXmlFile(file)
   
+  ## Modification for Dr.F.Nansen xmls
+  
+  if(dt$mission$callsignal== "LDLG" & dt$mission$platformname=="Dr.Fridtjof Nansen"){
+    if("fishingdepthstart" %in% colnames(dt$fishstation)){
+      if(!anyNA(dt$fishstation$fishingdepthstart)){
+        dt$fishstation$fishingdepthmin <- dt$fishstation$fishingdepthstart
+      }
+    }
+    
+    dt$individual$maturationstage <- ifelse(as.numeric(dt$individual$maturationstage)>=100,
+                                            as.character(as.numeric(dt$individual$maturationstage)-100),
+                                            dt$individual$maturationstage)
+  }
+  
+  
   ## Mission data ---
   
   msn <- dt$mission

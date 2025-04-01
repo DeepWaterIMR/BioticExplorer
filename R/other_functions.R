@@ -94,3 +94,20 @@ prettyDec <- function(dt) {
   for (j in cols) suppressWarnings(set(dt, j = j, value = as.numeric(format(dt[[j]]))))
   return(dt)
 }
+
+
+#' @title Custom leaflet legend
+
+addLegendCustom <- function(map, colors, position, sizes, labels, opacity = 1, title='fill in your title'){
+  colorAdditions <- paste0(colors, "; border-radius: 50%; width:", sizes, "px; height:", 
+                           sizes, "px;margin-top: 3px; inline-block; vertical-align: middle; middle: ",
+                           sizes)
+  labelAdditions <- paste0("<div style='display: inline-block; vertical-align: middle; top: ",
+                           sizes, "px;margin-top: 3px; line-height: ", sizes, "px;'>",
+                           labels, "</div>")
+  position <- 'topleft'
+  
+  return(addLegend(map, position=position, colors = colorAdditions, labels = labelAdditions,
+                   opacity = opacity, title = title))
+}
+

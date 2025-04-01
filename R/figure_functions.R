@@ -466,7 +466,7 @@ catchCompMap <- function(data) {
 catchMap <- function(data, species) {
   
   ## Definitions
-  
+  #species='All'
   if (species == "All") {
     sps <- unique(data$commonname)
   } else {
@@ -486,27 +486,52 @@ catchMap <- function(data, species) {
   
   if (nrow(tmp2) > 0) tmp2$catchsum <- 0
   
+  ## Legend breaks
+  library(purrr)
+  library(data.table)
+  library(rlang)
+
+  breaks=c(-Inf, 1, 10, 10^2, 0.5*10^3, 10^3, 0.5*10^4, +Inf)
+  sizes = c(2, 3, 6, 9, 12, 16, 20, 25)
+  conditions = mapply(c, breaks, shift(breaks,1,type = 'lead'), shift(sizes,1,type='lead'), SIMPLIFY = FALSE)
+  names(conditions) = map2_chr(breaks, shift(breaks,1,type = 'lead'), ~ paste0(.x, "-", .y))
+  conditions <- purrr::map(.x = conditions[-length(conditions)], ~quo(between(catchsum, !!.x[1], !!.x[2]) ~ !!.x[3]))
+  conditions[length(conditions)] <- NULL
+  labels = c("Not caught", 
+             paste0("<", as.character(breaks[2])),
+             map2_chr(shift(breaks,1,type = 'lead'), shift(breaks,2,type = 'lead'), ~ paste0(.x, "-", .y))[1:5],
+             paste0(">", as.character(breaks[length(breaks)-1])))
+  
+  tmp <- tmp %>% mutate(WeightClass = case_when(!!!conditions) %>% 
+         factor(levels=sizes))  
+  
   ## Plot
   
   p <- leaflet::leaflet(tmp, options = leafletOptions(zoomControl = FALSE)) %>% 
     addTiles(urlTemplate = "https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}",
              attribution = "Tiles &copy; Esri &mdash; Sources: GEBCO, NOAA, CHS, OSU, UNH, CSUMB, National Geographic, DeLorme, NAVTEQ, and Esri") %>%
-    addCircles(lat = ~ latitudestart, lng = ~ longitudestart, 
-               weight = 4, radius = 5e4*(tmp$catchsum/max(tmp$catchsum)), 
-               label = paste0(tmp$serialnumber, "; ", tmp$catchsum, " kg"), 
-               popup = paste("Serial number:", tmp$serialnumber, "<br>",
-                             "Date:", tmp$stationstartdate, "<br>",
-                             "Gear code:", tmp$gear, "<br>",
-                             "Bottom depth:", round(tmp$bottomdepthstart, 0), "m",
-                             "<br>", species, "catch:", tmp$catchsum, 
-                             "kg"), 
-               color = "red", fill = NA
-    ) 
+    addCircleMarkers(lat = ~ latitudestart, lng = ~ longitudestart, 
+                     weight = 2, stroke = T, 
+                     radius = 0.5*as.numeric(as.character(tmp$WeightClass)), #radius is in px, 0.5 needed as the border width is set to 50% in the addLegendCustom function
+                     label = paste0(tmp$serialnumber, "; ", tmp$catchsum, " kg"), 
+                     popup = paste("Serial number:", tmp$serialnumber, "<br>",
+                                   "Date:", tmp$stationstartdate, "<br>",
+                                   "Gear code:", tmp$gear, "<br>",
+                                   "Bottom depth:", round(tmp$bottomdepthstart, 0), "m",
+                                   "<br>", species, "catch:", tmp$catchsum, 
+                                   "kg"), 
+                     color = "red", fill = NA) %>% 
+    addLegendCustom(title = paste0(species, "<br>", "Weight (Kg)"),
+                    colors = c("black", rep("red",length(sizes)-1)),
+                    labels = labels,
+                    sizes = sizes  
+    )
+    
   
   if (nrow(tmp2) > 0) {
     p %>% 
       addCircles(lat = tmp2$latitudestart, lng = tmp2$longitudestart, 
-                 weight = 4, radius = 1, 
+                 weight = 2, radius = 1, 
                  label = paste0(tmp2$serialnumber, "; ", tmp2$catchsum, " kg"), 
                  popup = paste("Serial number:", tmp2$serialnumber, "<br>",
                                "Date:", tmp2$stationstartdate, "<br>",
