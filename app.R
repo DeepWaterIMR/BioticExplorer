@@ -769,9 +769,7 @@ body <-
                 box(title = "1. Select the figures to export", width = 12, status = "info", 
                     solidHeader = TRUE,
                     
-                    p("This tab is still under development and does not work as intended yet."),
-                    
-                    checkboxGroupInput("cruiseMapExport", label = h4("Station map"), 
+                    checkboxGroupInput("cruiseMapExport", label = h4("Station map"),
                                        choices = list("Station map" = 1),
                                        selected = NULL, inline = TRUE),
                     
@@ -817,9 +815,13 @@ body <-
                                        selected = NA, inline = TRUE),
                     
                     h4("Species plots"),
-                    
-                    checkboxGroupInput("speciesFigureExport", 
-                                       label = NULL, 
+
+                    selectInput("exportFigureSpecies", "Species:",
+                                choices = c("Select a species to generate the plots"),
+                                width = "50%"),
+
+                    checkboxGroupInput("speciesFigureExport",
+                                       label = NULL,
                                        choices = speciesFigureList,
                                        selected = NA, inline = TRUE)
                     
@@ -1487,51 +1489,117 @@ server <- shinyServer(function(input, output, session) {
   ### Download figures ####
   
   output$downloadFigures <- downloadHandler(
-    
+
     filename = function() "BioticExplorer_figures.zip",
-    
+
     content = function(file) {
-      
+
       owd <- setwd(tempdir())
       on.exit(setwd(owd))
       files <- NULL
-      
-      spOverviewDat <- speciesOverviewData(rv$stnall)
-      
-      ## Station overview figures
-      
-      if(!is.null(input$stationOverviewExport)) {
-        
-        for (i in 1:length(input$stationOverviewExport)) {
-          
-          fileName <- paste0(input$stationOverviewExport[i], input$downloadFigureFormat)
-          
-          ggplot2::ggsave(fileName, plot = get(input$stationOverviewExport[i])(spOverviewDat, base_size = 8), width = input$figureWidth, height = 0.7*input$figureWidth, units = "cm")
-          
-          files <- c(fileName,files)
+
+      figW <- input$figureWidth
+      figH <- 0.7 * figW
+      fmt  <- input$downloadFigureFormat
+
+      saveFig <- function(name, p) {
+        fn <- paste0(name, fmt)
+        ggplot2::ggsave(fn, plot = p, width = figW, height = figH, units = "cm")
+        files <<- c(fn, files)
+      }
+
+      saveMap <- function(name, m) {
+        fn <- paste0(name, fmt)
+        mapview::mapshot(m, file = fn, vwidth = 1323)
+        files <<- c(fn, files)
+      }
+
+      ## Station overview figures (ggplot) ----
+
+      if (!is.null(input$stationOverviewExport)) {
+        spOverviewDat <- speciesOverviewData(rv$stnall)
+        for (fig in input$stationOverviewExport) {
+          saveFig(fig, get(fig)(spOverviewDat, base_size = 8))
         }
       }
-      
-      ## Station maps
-      
-      if(!is.null(input$stationMapExport)) {
-        
-        for(i in 1:length(input$stationMapExport)) {
-          
-          fileName <- paste0(input$stationMapExport[i], input$downloadFigureFormat)
-          
-          mapview::mapshot(get(input$stationMapExport[i])(spOverviewDat), file = fileName, vwidth = 1323)
-          
-          files <- c(fileName,files)
-          
-        }
-        
+
+      ## Total catch map (leaflet, species-specific) ----
+
+      if (!is.null(input$stationCatchMapExport)) {
+        if (is.null(spOverviewDat)) spOverviewDat <- speciesOverviewData(rv$stnall)
+        saveMap("catchMap", catchMap(rv$stnall, species = input$catchMapExportSpecies))
       }
-      
-      if(is.null(files)) {
+
+      ## Catch composition map (leaflet) ----
+
+      if (!is.null(input$stationMapExport)) {
+        if (!exists("spOverviewDat")) spOverviewDat <- speciesOverviewData(rv$stnall)
+        for (fig in input$stationMapExport) {
+          saveMap(fig, get(fig)(spOverviewDat))
+        }
+      }
+
+      ## Individual overview figures (ggplot) ----
+
+      if (!is.null(input$individualOverviewExport)) {
+        for (fig in input$individualOverviewExport) {
+          p <- if (fig == "indLengthPlot") indLengthPlot(indall = rv$indall) else indWeightPlot(indall = rv$indall)
+          saveFig(fig, p)
+        }
+      }
+
+      ## Species-specific figures ----
+
+      exportSp <- input$exportFigureSpecies
+      speciesOk <- !is.null(input$speciesFigureExport) &&
+        !is.null(exportSp) && exportSp != "" &&
+        !exportSp %in% c("Select a species to generate the plots", "No species with sufficient data")
+
+      if (speciesOk) {
+
+        indOverviewDat <- individualFigureData(rv$indall, indSpecies = exportSp,
+                                               lengthUnit = input$lengthUnit,
+                                               weightUnit = input$weightUnit,
+                                               useEggaSystem = FALSE)
+
+        for (fig in input$speciesFigureExport) {
+          nm <- paste0(fig, "_", exportSp)
+
+          if (fig == "lwPlot" && !is.null(indOverviewDat$lwDat)) {
+            saveFig(nm, lwPlot(data = indOverviewDat, lwPlotLogSwitch = input$lwPlotLogSwitch))
+
+          } else if (fig == "laPlot" && !is.null(indOverviewDat$laDat)) {
+            saveFig(nm, laPlot(data = indOverviewDat,
+                               laPlotSexSwitch     = input$laPlotSexSwitch,
+                               growthModelSwitch   = input$growthModelSwitch,
+                               forceZeroGroupLength   = input$forceZeroGroupLength,
+                               forceZeroGroupStrength = input$forceZeroGroupStrength)$laPlot)
+
+          } else if (fig == "l50Plot" && !is.null(indOverviewDat$l50Dat)) {
+            saveFig(nm, l50Plot(data = indOverviewDat)$Plot)
+
+          } else if (fig == "sexRatioMap" && !is.null(indOverviewDat$srDat)) {
+            saveMap(nm, sexRatioMap(data = indOverviewDat))
+
+          } else if (fig == "sizeDistributionMap" && !is.null(indOverviewDat$sdDat)) {
+            saveMap(nm, sizeDistributionMap(data = indOverviewDat))
+
+          } else if (fig == "lengthDistributionPlot" && !is.null(indOverviewDat$ldDat)) {
+            saveFig(nm, lengthDistributionPlot(data = indOverviewDat))
+
+          } else if (fig == "stageDistributionPlot" && !is.null(indOverviewDat$ldDat)) {
+            if (nrow(na.omit(indOverviewDat$ldDat[input$stageSelectionSwitch])) > 10) {
+              saveFig(nm, stageDistributionPlot(data = indOverviewDat,
+                                                selectedStage = input$stageSelectionSwitch))
+            }
+          }
+        }
+      }
+
+      if (is.null(files)) {
         stop("Select figures to download")
       } else {
-        zip(file,files)
+        zip(file, files)
       }
     }
   )

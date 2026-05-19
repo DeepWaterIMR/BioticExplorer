@@ -125,8 +125,9 @@ updateFilterform <- function(db = FALSE, loadDb = FALSE) {
     updateSelectInput(session, "catchMapSpecies", choices = c("All", rv$all$commonname))
     updateSelectInput(session, "catchMapExportSpecies", choices = c("All", rv$all$commonname))
     updateSelectInput(session, "indSpecies", choices = c("Select a species to generate the plots", rv$all$indSpecies))
+    updateSelectInput(session, "exportFigureSpecies", choices = c("Select a species to generate the plots", rv$all$indSpecies))
     updateSliderInput(session, "selLonDb", min = rv$all$min.lon, max = rv$all$max.lon, value = rv$sub$lon, step = 0.1)
-    updateSliderInput(session, "selLatDb", min = rv$all$min.lat, max = rv$all$max.lat, value = rv$sub$lat, step = 0.1) 
+    updateSliderInput(session, "selLatDb", min = rv$all$min.lat, max = rv$all$max.lat, value = rv$sub$lat, step = 0.1)
   } else {
     updateSelectizeInput(session, "subYear", choices = rv$all$startyear, server = TRUE)
     updateSelectizeInput(session, "subSpecies", choices = rv$all$commonname, server = TRUE)
@@ -139,8 +140,9 @@ updateFilterform <- function(db = FALSE, loadDb = FALSE) {
     updateSelectInput(session, "catchMapSpecies", choices = c("All", rv$all$commonname))
     updateSelectInput(session, "catchMapExportSpecies", choices = c("All", rv$all$commonname))
     updateSelectInput(session, "indSpecies", choices = c("Select a species to generate the plots", rv$all$indSpecies))
+    updateSelectInput(session, "exportFigureSpecies", choices = c("Select a species to generate the plots", rv$all$indSpecies))
     updateSliderInput(session, "subLon", min = rv$all$min.lon, max = rv$all$max.lon, value = rv$sub$lon, step = 0.1)
-    updateSliderInput(session, "subLat", min = rv$all$min.lat, max = rv$all$max.lat, value = rv$sub$lat, step = 0.1) 
+    updateSliderInput(session, "subLat", min = rv$all$min.lat, max = rv$all$max.lat, value = rv$sub$lat, step = 0.1)
   }
 }
 
