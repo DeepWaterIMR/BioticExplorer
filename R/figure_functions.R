@@ -32,7 +32,7 @@ speciesOverviewData <- function(data) {
   
   # Number of stations
   
-  nStn <- data %>% lazy_dt() %>% dplyr::group_by(commonname) %>% dplyr::summarise(n = length(unique(paste(startyear, serialnumber)))) %>% arrange(-n) %>% collect()
+  nStn <- data %>% lazy_dt() %>% filter(!is.na(commonname)) %>% dplyr::group_by(commonname) %>% dplyr::summarise(n = length(unique(paste(startyear, serialnumber)))) %>% arrange(-n) %>% collect()
   nStn$commonname <- factor(nStn$commonname, nStn$commonname)
   
   # Catch weight
@@ -468,7 +468,7 @@ catchMap <- function(data, species) {
   ## Definitions
   
   if (species == "All") {
-    sps <- unique(data$commonname)
+    sps <- unique(data$commonname[!is.na(data$commonname)])
   } else {
     sps <- species
   }

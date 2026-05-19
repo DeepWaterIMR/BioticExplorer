@@ -946,7 +946,7 @@ server <- shinyServer(function(input, output, session) {
           index$cruise <- rv$inputData$mission %>% select(cruise) %>% distinct() %>% pull() %>% sort()
           index$year <- rv$inputData$mission %>% select(startyear) %>% distinct() %>% pull() %>% sort()
           index$nstations <- rv$inputData$stnall %>% select(missionid, startyear, serialnumber) %>% distinct() %>% count() %>% pull()
-          index$commonname <- rv$inputData$stnall %>% select(commonname) %>% distinct() %>% pull() %>% sort()
+          index$commonname <- rv$inputData$stnall %>% filter(!is.na(commonname)) %>% select(commonname) %>% distinct() %>% pull() %>% sort()
           index$platformname <- rv$inputData$stnall %>% select(platformname) %>% distinct() %>% pull() %>% sort()
           index$serialnumber <- rv$inputData$stnall %>% select(serialnumber) %>% distinct() %>% pull() %>% sort()
           index$gear <- rv$inputData$stnall %>% select(gear) %>% distinct() %>% pull() %>% sort()
