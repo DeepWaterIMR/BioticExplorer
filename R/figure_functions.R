@@ -774,6 +774,12 @@ individualFigureData <- function(indall, indSpecies = input$indSpecies, lengthUn
 
 ## lwPlot ####
 
+#' @title Plot length-weight relationship for a species
+#' @description Plots the length-weight relationship for a selected species using data from \link{individualFigureData}.
+#' @param data list returned by \link{individualFigureData}.
+#' @param lwPlotLogSwitch logical. If \code{TRUE}, axes are log10-transformed and a linear model is fitted; if \code{FALSE}, the power-law curve is overlaid on untransformed axes.
+#' @return Returns a ggplot object.
+#' @import ggplot2
 lwPlot <- function(data, lwPlotLogSwitch = input$lwPlotLogSwitch) {
   
   p <- suppressWarnings({
@@ -813,6 +819,15 @@ lwPlot <- function(data, lwPlotLogSwitch = input$lwPlotLogSwitch) {
 
 ## laPlot ####
 
+#' @title Plot age-length growth model for a species
+#' @description Fits and plots a growth model (von Bertalanffy, Gompertz, or Logistic) to age-length data for a selected species, optionally split by sex.
+#' @param data list returned by \link{individualFigureData}.
+#' @param laPlotSexSwitch logical. If \code{TRUE}, separate models are fitted and plotted for females and males.
+#' @param growthModelSwitch character. One of \code{"vout"} (von Bertalanffy), \code{"gout"} (Gompertz), or \code{"lout"} (Logistic), matching the output slot names from \code{\link[fishmethods]{growth}}.
+#' @param forceZeroGroupLength numeric or \code{NA}. If not \code{NA}, synthetic age-0 observations at this length are added to anchor the growth curve.
+#' @param forceZeroGroupStrength numeric. Percentage of the original sample size to use as synthetic age-0 observations when \code{forceZeroGroupLength} is set.
+#' @return Returns a named list with elements \code{laPlot} (ggplot object) and \code{laText} (character string summarising model coefficients).
+#' @import ggplot2
 # data = indOverviewDat = individualFigureData(indall = rv$indall, indSpecies = input$selSpeciesDb); laPlotSexSwitch = FALSE; growthModelSwitch = "vout"; forceZeroGroupLength = NA; forceZeroGroupStrength = 10
 laPlot <- function(data, laPlotSexSwitch, growthModelSwitch, forceZeroGroupLength = NA, forceZeroGroupStrength = 10) {
   
@@ -954,6 +969,11 @@ laPlot <- function(data, laPlotSexSwitch, growthModelSwitch, forceZeroGroupLengt
 
 ## l50Plot ####
 
+#' @title Plot 50% maturity at length (L50) for a species
+#' @description Fits sex-specific logit regressions to maturity-at-length data and plots the resulting L50 curves with confidence intervals.
+#' @param data list returned by \link{individualFigureData}. Must contain a non-NULL \code{l50Dat} element.
+#' @return Returns a named list with elements \code{Plot} (ggplot object) and \code{Text} (character string summarising L50 estimates and confidence intervals).
+#' @import ggplot2
 l50Plot <- function(data) {
   
   modF <- glm(maturity ~ length, data = data$l50Dat[data$l50Dat$sex == "Female",], family = binomial(link = "logit"))
@@ -1010,6 +1030,11 @@ l50Plot <- function(data) {
 
 ## Sex ratio map ####
 
+#' @title Plot sex ratio per station on a leaflet map
+#' @description Plots female/male sex ratio for a selected species as pie-chart markers scaled by total count on an interactive leaflet map.
+#' @param data list returned by \link{individualFigureData}. Must contain a non-NULL \code{srDat} element.
+#' @return Returns a \link[leaflet]{leaflet} object.
+#' @import leaflet
 sexRatioMap <- function(data) {
   x <- data$srDat %>% 
     filter(!is.na(longitudestart), !is.na(latitudestart))
@@ -1028,6 +1053,11 @@ sexRatioMap <- function(data) {
 
 ## Size distribution map ####
 
+#' @title Plot geographic size distribution for a species on a leaflet map
+#' @description Plots the geographic distribution of length classes for a selected species as pie-chart markers scaled by total count on an interactive leaflet map.
+#' @param data list returned by \link{individualFigureData}. Must contain a non-NULL \code{sdDat} element.
+#' @return Returns a \link[leaflet]{leaflet} object.
+#' @import leaflet
 sizeDistributionMap <- function(data) {
   sdDatW <- data$sdDat %>% 
     filter(!is.na(longitudestart), !is.na(latitudestart)) %>% 
@@ -1048,6 +1078,11 @@ sizeDistributionMap <- function(data) {
 
 ## Length distribution plot ####
 
+#' @title Plot sex-specific length distribution for a species
+#' @description Plots kernel density estimates of length, coloured by sex, for a selected species.
+#' @param data list returned by \link{individualFigureData}. Must contain a non-NULL \code{ldDat} element.
+#' @return Returns a ggplot object.
+#' @import ggplot2
 lengthDistributionPlot <- function(data) {
   ggplot(data$ldDat, aes(x = length, after_stat(count), color = sex)) +
     geom_density(adjust = 0.5) +
@@ -1060,6 +1095,12 @@ lengthDistributionPlot <- function(data) {
 
 ## Stage distribution plot ####
 
+#' @title Plot stage-specific length distribution for a species
+#' @description Plots histograms of length faceted by sex and filled by maturation or special stage for a selected species.
+#' @param data list returned by \link{individualFigureData}. Must contain a non-NULL \code{ldDat} element.
+#' @param selectedStage character. One of \code{"maturationstage"} or \code{"specialstage"}.
+#' @return Returns a ggplot object.
+#' @import ggplot2
 stageDistributionPlot <- function(data, selectedStage) {
   
   stageName <- c("maturationstage" = "Maturation stage", "specialstage" = "Special stage")

@@ -183,30 +183,36 @@ body <-
       
       ## Info tab ####   
       
-      tabItem("info", 
+      tabItem("info",
               fluidRow(
                 column(width = 12,
-                       h1("Welcome to the Biotic Explorer", align = "center"),
+                       h1("Welcome to Biotic Explorer", align = "center"),
                        br(),
-                       p("This is a", a("Shiny app", href = "http://shiny.rstudio.com"), "allowing data exploration of the Institute of Marine Research's database (IMR). The app can also be used to examine Norwegian Maritime Data-center (NMD) Biotic v3 .xml files. Click the", strong("'Load data & filter'"), "tab on the side panel to get started. Note that the IMR logo turns to a 'BUSY' symbol when the app is processing information. Avoid clicking anything while the app is busy."),
+                       p("This is a", a("Shiny app", href = "https://shiny.posit.co"), "for exploring NMD Biotic data from the Institute of Marine Research (IMR). The app operates in two modes: ", strong("file mode"), "(open local NMD Biotic v3 XML files) and ", strong("database mode"), "(connect to a DuckDB database compiled by", a("BioticExplorerServer", href = "https://github.com/DeepWaterIMR/BioticExplorerServer"), "). Click the", strong("'Load data & filter'"), "tab on the side panel to get started."),
+                       p("The IMR logo in the top-left corner turns to a ", strong("BUSY"), "symbol while the app is processing. Avoid clicking anything while the app is busy. Note that internal R processing and GUI rendering are separate steps — it may take a moment for the app to become responsive after the BUSY symbol disappears."),
                        h3("Usage"),
-                       h4("Read"),
-                       p(strong("Database:"), "Click 'Load data & filter -> From the database'. Select the desired data and click 'Send inquiry'. The 'BUSY' symbol on the left top corner will disappear when the operation is done. This may take time depending on the size of the selected dataset. You will get an overview of selected data and positions on the right. You can now further limit the dataset using the 'Subset' button and reset the data selection using the 'Reset' button."),
-                       p(strong("File:"), "Click 'Load data & filter -> From files -> Browse..' and select one or multiple .xml files from your computer. An overview of data and sampling station locations will be shown below. Use the 'Filter data by' options to select data you want to keep. Click the 'Subset' button once you are ready and see how the overview will change based on the information you selected. The 'Reset' button will reset the selection."),
-                       p(strong("Resume a previous session:"), "Click 'Load data & filter -> From files -> Browse..' and open an .rds file saved using the app (see 'Download'). You can now continue working on data from an earlier Biotic Explorer session."),
-                       h4("Examine"),
-                       p(strong("Cruise overview:"), "Click the 'Cruise overview' tab to see all cruises in the dataset. These data comprise of the '$mission' element in NMD Biotic files."),
-                       p(strong("Stations & catches:"), "The 'Overview' tab lists selected plots to establish an overview of the '$fishstation' and '$catchsample' elements in NMD Biotic files. 'Map of catches' tab shows a location overview of catches and the 'Examine data' the data in a tabular form."),
-                       p(strong("Individuals & ages:"), "The 'Overview' tab shows a general overview of the '$individual' and '$agedetermination' elements in NMD Biotic files. The 'Species plots' tab can be used to generate plots describing basic life-history parameters of a species with sufficient data and the 'Examine data' tab shows the data in a tabular form."),
-                       p(strong("Hierarchical data tables"), "tab shows the data in NMD Biotic hierarchical format."),
+                       h4("Read data"),
+                       p(strong("From the database:"), "Click 'Load data & filter → From the database'. Use the filter controls to narrow down the dataset, then click 'Send inquiry'. The BUSY symbol disappears when the operation is done — this may take time for large selections. An overview of the selected data and station positions is shown on the right. You can further narrow the selection with the 'Subset' button, or return to the full database selection with 'Reset'."),
+                       p(strong("From files:"), "Click 'Load data & filter → From files → Browse..' and select one or more .xml files from your computer. An overview and station map appear below. Use the 'Filter data by' fields to select the data you want to keep and click 'Subset'. The 'Reset' button restores the full loaded dataset."),
+                       p(strong("Resume a previous session:"), "Click 'Load data & filter → From files → Browse..' and open an .rds file previously saved from BioticExplorer (see 'Export data' below). The session resumes with all data and filter selections intact."),
+                       h4("Examine data"),
+                       p(strong("Cruise overview:"), "Shows all cruises (the 'mission' element of NMD Biotic files) in a searchable table."),
+                       p(strong("Stations & catches:"), "Contains three tabs — 'Overview' (summary plots of catch composition, catch weights, gear types, and station depths), 'Map of catches' (interactive map of catch weight per station with a species selector), and 'Examine data' (full merged station and catch dataset in a searchable table)."),
+                       p(strong("Individuals & ages:"), "Contains three tabs — 'Overview' (length and weight distribution plots across all species with sufficient data, plus a measurement count summary), 'Species plots' (life-history plots for a selected species: length–weight relationship, age–length growth model, L50 maturity, sex ratio map, geographic size distribution, sex-specific length distribution, and stage-specific length distribution), and 'Examine data' (full merged individual and age dataset)."),
+                       p(strong("Hierarchical data tables:"), "Exposes the raw NMD Biotic elements ('fishstation', 'catchsample', 'individual', 'agedetermination') in their original tabular form."),
                        h4("Download"),
-                       p(strong("Data:"), "Data from a Biotic Explorer session can be downloaded using the 'Download -> Data' tab. If you want to reopen the data in Biotic Explorer or open the data in R, use the 'R' option without changing 'Data to download' options. This will save the data as an .rds file, which can be opened using the", a("'readRDS'", href = "https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html"), "function in R and reopened using Biotic Explorer. Data can also be downloaded as .zip compressed .csv files or as an Excel file. The data are automatically placed to tabs in Excel files."),
-                       p(strong("Figures:"), "You can select which Biotic Explorer figures to download and in which format using the 'Download -> Figures' tab. If you want to modify the figures beyond the options given in the app, you may", a("download Biotic Explorer", href = "https://github.com/MikkoVihtakari/BioticExplorer"), "and modify the figure functions listed under 'R/figure_functions.R'."),
+                       p(strong("Export data:"), "Use the 'Download → Data' tab to export the current session. To reopen the data in BioticExplorer or in R, choose the 'R' format — this saves an .rds file readable with", a("readRDS()", href = "https://stat.ethz.ch/R-manual/R-devel/library/base/html/readRDS.html"), ". Data can also be exported as ZIP-compressed CSV files or as a multi-sheet Excel workbook."),
+                       p(strong("Export figures:"), "Use the 'Download → Figures' tab to export any combination of figures as PNG, JPEG, or PDF. The following figure groups are available:"),
+                       tags$ul(
+                         tags$li(strong("Station overview figures"), "— species composition, summed/mean/range catch weights, mean specimen weight, catch counts, gear-type catch totals, station depth, and fishing depth by species."),
+                         tags$li(strong("Station maps"), "— total catch map (by species or all species combined) and catch composition pie-chart map."),
+                         tags$li(strong("Individual overview"), "— length and weight distributions across all species with sufficient measurements."),
+                         tags$li(strong("Species-specific figures"), "— select a species from the dropdown to export any of: length–weight relationship, age–length growth curve (von Bertalanffy, Gompertz, or Logistic), 50% maturity at length (L50), sex ratio map, geographic size distribution map, sex-specific length distribution, and stage-specific length distribution. Figures for which the selected species lacks sufficient data are silently skipped.")
+                       ),
+                       p("To modify figures beyond the options offered in the app,", a("download BioticExplorer", href = "https://github.com/DeepWaterIMR/BioticExplorer"), "and edit R/figure_functions.R."),
                        br(),
-                       br(),
-                       h5("Authors: The StoX project team (Mikko Vihtakari, Ibrahim Umar)", align = "left"),
-                       h5("Contact person: Mikko Vihtakari (mikko.vihtakari@hi.no)", align = "left"),
-                       h5("(c) Institute of Marine Research, Norway, acknowledging the", a("RStudio team, Shiny developers", href = "https://www.rstudio.com/about/"), "and the", a("community", href = "https://stackoverflow.com/questions/tagged/shiny"), align = "left")
+                       h5("Maintainer: Mikko Vihtakari (mikko.vihtakari@hi.no)", align = "left"),
+                       h5("(c) Institute of Marine Research, Norway", align = "left")
                 )
               )
       ),

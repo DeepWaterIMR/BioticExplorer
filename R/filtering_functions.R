@@ -1,5 +1,8 @@
 #' @title Process range text input
-
+#' @description Parses a comma-separated or colon-range text input (e.g. \code{"1, 3:5, 7"}) into a vector of integers, then intersects with an allowed index to discard out-of-range values.
+#' @param inp character scalar from a Shiny text input, or \code{NULL}.
+#' @param idx integer vector of valid values to intersect against.
+#' @return Returns an integer vector of selected values, or \code{NULL} if \code{inp} is \code{NULL} or produces no valid selections.
 processRangeInput <- function(inp, idx) {
   # Sanitize input
   if(is.null(inp))
@@ -15,7 +18,9 @@ processRangeInput <- function(inp, idx) {
 }
 
 #' @title Update subset selectors
-
+#' @description Recomputes \code{rv$all}, the list of all unique values available for each filter control, from the current \code{rv$mission}, \code{rv$stnall}, and \code{rv$indall} reactives. In database mode, also populates optional columns (\code{gearcategory}, \code{icesarea}, \code{area}, \code{cruiseseriescode}) when present.
+#' @param db logical. If \code{TRUE}, database-mode columns are included; otherwise only file-mode columns are populated.
+#' @return Called for its side effect: updates \code{rv$all} in the enclosing Shiny server environment.
 updateSelectors <- function(db = FALSE) {
   
   # Update selectors
@@ -147,7 +152,9 @@ updateFilterform <- function(db = FALSE, loadDb = FALSE) {
 }
 
 #' @title Generate the station map
-
+#' @description Renders a leaflet station map overlaid with the current coordinate filter rectangle and assigns it to the appropriate Shiny output (\code{stationMapDb} in database mode, \code{stationMap} in file mode).
+#' @param db logical. If \code{TRUE}, the map is rendered into the database-mode output slot; otherwise into the file-mode slot.
+#' @return Called for its side effect: sets a \code{renderLeaflet} output in the enclosing Shiny server environment.
 updateMap <- function(db = FALSE) {
   
   # Data 
@@ -327,8 +334,10 @@ obsPopulatePanel <- function(db = FALSE) {
   updateMap(db = db)
 }
 
-#' @title Make a filter chain for file-based- and database-data loaded into the memory
-
+#' @title Make a filter chain from current UI inputs
+#' @description Reads all active filter controls and builds a list of \code{dplyr::filter()} expression strings that can be applied to either an in-memory data.table (file mode) or a lazy DBI table (database mode).
+#' @param db logical. If \code{TRUE}, reads database-mode inputs (\code{selYearDb}, \code{selSpeciesDb}, etc.); otherwise reads file-mode inputs (\code{subYear}, \code{subSpecies}, etc.).
+#' @return Returns a named list with elements \code{filterChain} (list of character expressions ready for \code{rlang::parse_exprs()}) and \code{sub} (list of the selected values for each filter dimension, used to update coordinate sliders).
 makeFilterChain <- function(db = FALSE) {
   
   sub <- list()
