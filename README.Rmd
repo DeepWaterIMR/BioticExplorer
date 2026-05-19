@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 ## The server version
 
-A server version of Biotic Explorer is located on IMR servers (`http://njord:8080/bioticexplorer/`) and can be run through any modern web browser **inside the IMR firewall** (intranet or VPN).
+There is currently no server version of Biotic Explorer running. Run it locally on your computer by following the instructions below.
 
 ## Installation of the desktop version
 
