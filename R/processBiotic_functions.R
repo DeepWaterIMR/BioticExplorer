@@ -105,9 +105,9 @@ processBioticFile <- function(file, removeEmpty = TRUE, convertColumns = TRUE, r
 
   coredat <- merge(msn[, !names(msn) %in% c("purpose"), with = FALSE], stn, by = names(msn)[names(msn) %in% names(stn)], all = TRUE)
 
-  # Stndat: full outer join so stations with no catch are retained (commonname = NA)
+  # Stndat: left join so stations with no catch are retained (commonname = NA)
 
-  stndat <- merge(coredat, cth, all = TRUE, by = c("missiontype", "missionnumber", "startyear", "platform", "serialnumber"))
+  stndat <- merge(coredat, cth, all.x = TRUE, by = c("missiontype", "missionnumber", "startyear", "platform", "serialnumber"))
 
   # Inddat: all.y keeps only rows with individual measurements; empty stations are not included
 
@@ -254,29 +254,6 @@ convertColumnTypes <- function(df) {
 
 
 
-## Warning/Error catcher ----
-
-#' @title tryCatch both warnings (with value) and errors
-#' @param expr an \R expression to evaluate
-#' @return List of logicals indicating whether the \code{expr} produces a warning or error.
-#' @author Martin Maechler; Copyright (C) 2010-2012 The R Core Team, Mikko Vihtakari (Institute of Marine Research)
-#' @export
-
-tryCatchWE <- function(expr) {
-  W <- NULL
-  
-  w.handler <- function(w){ # warning handler
-    W <<- w
-    invokeRestart("muffleWarning")
-  }
-  
-  er <- withCallingHandlers(tryCatch(expr, error = function(e) e), warning = w.handler)
-  
-  list(error = "error" %in% class(er), warning = !is.null(W))
-  
-}
-
-
 # Print method for bioticProcData ----
 
 #' @title Print processed NMD Biotic data (\code{bioticProcData}) objects
@@ -296,10 +273,10 @@ print.bioticProcData <- function(x, ...) {
   cat("A list of data containing following elements:", sep = "\n")
   cat(NULL, sep = "\n")
   cat(paste0("$mission: ", nrow(x$mission), " rows and ", ncol(x$mission), " columns"), sep = "\n")
-  cat(paste0("$fishstation: ", nrow(x$fishstation), " rows and ", ncol(x$fishstation), " columns"), sep = "\n")
-  cat(paste0("$catchsample: ", nrow(x$catchsample), " rows and ", ncol(x$catchsample), " columns"), sep = "\n")
-  cat(paste0("$individual: ", nrow(x$individual), " rows and ", ncol(x$individual), " columns"), sep = "\n")
-  cat(paste0("$agedetermination: ", nrow(x$agedetermination), " rows and ", ncol(x$agedetermination), " columns"), sep = "\n")
+  if(!is.null(x$fishstation)) cat(paste0("$fishstation: ", nrow(x$fishstation), " rows and ", ncol(x$fishstation), " columns"), sep = "\n")
+  if(!is.null(x$catchsample)) cat(paste0("$catchsample: ", nrow(x$catchsample), " rows and ", ncol(x$catchsample), " columns"), sep = "\n")
+  if(!is.null(x$individual)) cat(paste0("$individual: ", nrow(x$individual), " rows and ", ncol(x$individual), " columns"), sep = "\n")
+  if(!is.null(x$agedetermination)) cat(paste0("$agedetermination: ", nrow(x$agedetermination), " rows and ", ncol(x$agedetermination), " columns"), sep = "\n")
   cat(paste0("$stnall: ", nrow(x$stnall), " rows and ", ncol(x$stnall), " columns"), sep = "\n")
   cat(paste0("$indall: ", nrow(x$indall), " rows and ", ncol(x$indall), " columns"), sep = "\n")
   cat(NULL, sep = "\n")

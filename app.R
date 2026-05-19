@@ -138,7 +138,7 @@ sidebar <- dashboardSidebar(sidebarMenu(
   
   menuItem("Information", tabName = "info", icon = icon("info-circle")),
   
-  menuItem("Load data & filter", tabName = "info", icon = icon("arrow-circle-up"),
+  menuItem("Load data & filter", icon = icon("arrow-circle-up"),
            menuSubItem("From the database", tabName = "uploadDb", icon = icon("database")),
            menuSubItem("From files", tabName = "upload", icon = icon("file-code"))
            
@@ -206,7 +206,7 @@ body <-
                        br(),
                        h5("Authors: The StoX project team (Mikko Vihtakari, Ibrahim Umar)", align = "left"),
                        h5("Contact person: Mikko Vihtakari (mikko.vihtakari@hi.no)", align = "left"),
-                       h5("(c) Institute of Marine Research, Norway, acknowledging the", a("RStudio team, Shiny developers", href = "https://www.rstudio.com/about/"), "and the", a("community", hfer = "https://stackoverflow.com/questions/tagged/shiny"), align = "left")
+                       h5("(c) Institute of Marine Research, Norway, acknowledging the", a("RStudio team, Shiny developers", href = "https://www.rstudio.com/about/"), "and the", a("community", href = "https://stackoverflow.com/questions/tagged/shiny"), align = "left")
                 )
               )
       ),
@@ -332,22 +332,17 @@ body <-
                          
                          conditionalPanel(
                            condition = "output.serverVersion == true",
-                           
+
                            conditionalPanel(condition = "output.fetchedDb == false",
                                             p("The IMR database contains tens of gigabytes of data. It is therefore important to select only the data you need before sending an inquiry. The estimated size of the database can be seen on the right. Once you have selected the needed data using this box, press the 'Send inquiry' button. Note that the data processing will take some time. Please, be patient. The server or your browser have probably not crashed even though you see nothing happening.")
-                                            
+
                            ),
-                           
+
                            conditionalPanel(condition = "output.fetchedDb == true",
                                             p("You have now selected data from the database and can see the overview on the right. You can use the 'Subset' button to further limit the data selection and the 'Reset' button to reload the entire database. Once you are happy with your dataset, you may proceed to other tabs in this application.")
-                                            
+
                            ),
-                           
-                           strong("Drop excess data:"),
-                           fluidRow(
-                             column(4, checkboxInput("removeEmpty", "Remove empty columns", TRUE))
-                           ),
-                           
+
                            fluidRow(
                              column(6, 
                                     selectizeInput(inputId = "selMissionTypeDb", 
@@ -1559,53 +1554,48 @@ server <- shinyServer(function(input, output, session) {
     },
     
     content = function(file) {
-      
-      if (sapply(strsplit(file, "\\."), "[", 2) == "zip") {
-        
+
+      isMultiCsv <- input$downloadFileType == ".csv" && length(input$downloadDataType) > 1
+
+      if (isMultiCsv) {
+
         owd <- setwd(tempdir())
         on.exit(setwd(owd))
         files <- NULL
-        
-        #loop through the sheets
+
         for (i in 1:length(input$downloadDataType)) {
-          
           fileName <- paste0(input$downloadDataType[i], ".csv")
           write.csv(
             prettyDec(eval(parse(text = paste("rv", input$downloadDataType[i], sep = "$")))),
-            fileName, row.names = FALSE, na = "") 
-          files <- c(fileName,files)
+            fileName, row.names = FALSE, na = "")
+          files <- c(fileName, files)
         }
-        #create the zip file
-        zip(file,files)
-        
-      } else if (sapply(strsplit(file, "\\."), "[", 2) == "rds") {
-        
+        zip(file, files)
+
+      } else if (input$downloadFileType == ".rda") {
+
         biotic <- lapply(input$downloadDataType, function(k) {
           eval(parse(text = paste("rv", k, sep = "$")))
         })
-        
         names(biotic) <- input$downloadDataType
-        
         saveRDS(biotic, file = file)
-        
-      } else if (sapply(strsplit(file, "\\."), "[", 2) == "xlsx") {
+
+      } else if (input$downloadFileType == ".xlsx") {
         wb <- openxlsx::createWorkbook()
-        
+
         for (i in 1:length(input$downloadDataType)) {
           openxlsx::addWorksheet(wb, paste(input$downloadDataType[i]))
-          openxlsx::writeData(wb, paste(input$downloadDataType[i]), 
+          openxlsx::writeData(wb, paste(input$downloadDataType[i]),
                               eval(parse(text = paste("rv", input$downloadDataType[i], sep = "$"))))
         }
-        
         openxlsx::saveWorkbook(wb, file)
-        
+
       } else {
         tmp <- switch(input$downloadDataType,
                       "mission" = prettyDec(rv$mission),
                       "stnall" = prettyDec(rv$stnall),
                       "indall" = prettyDec(rv$indall))
-        
-        write.csv(tmp, file, row.names = FALSE, na = "") 
+        write.csv(tmp, file, row.names = FALSE, na = "")
       }
     }
   )

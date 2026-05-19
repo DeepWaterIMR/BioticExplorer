@@ -23,6 +23,7 @@ updateSelectors <- function(db = FALSE) {
   rv$all$startyear <- rv$mission %>% lazy_dt() %>% select(startyear) %>% distinct() %>% pull() %>% sort()
   rv$all$commonname <- rv$stnall %>% lazy_dt() %>% filter(!is.na(commonname)) %>% select(commonname) %>% distinct() %>% pull() %>% sort()
   rv$all$cruise <- rv$mission %>% lazy_dt() %>% select(cruise) %>% distinct() %>% pull() %>% sort()
+  rv$all$missiontypename <- rv$mission %>% lazy_dt() %>% select(missiontypename) %>% distinct() %>% pull() %>% sort()
   rv$all$platformname <- rv$stnall %>% lazy_dt() %>% select(platformname) %>% distinct() %>% pull() %>% sort()
   rv$all$serialnumber <- rv$stnall %>% lazy_dt() %>% select(serialnumber) %>% distinct() %>% pull() %>% sort()
   rv$all$gear <- rv$stnall %>% lazy_dt() %>% select(gear) %>% distinct() %>% pull() %>% sort()
@@ -54,20 +55,35 @@ updateSelectors <- function(db = FALSE) {
   rv$all$date <- rv$stnall %>% lazy_dt() %>% summarise(min = min(stationstartdate, na.rm = TRUE), max = max(stationstartdate, na.rm = TRUE)) %>% collect()
   
   if(db) {
-    rv$all$missiontypename <- rv$mission %>% lazy_dt() %>% select(missiontypename) %>% distinct() %>% pull() %>% sort()
-    rv$all$gearcategory <- rv$stnall %>% lazy_dt() %>% select(gearcategory) %>% distinct() %>% pull() %>% sort()
-
-    tmpCS <- names(index$cruiseseries)
-    names(tmpCS) <- index$cruiseseries
-    rv$all$cruiseseries <- unique(unlist(strsplit(rv$mission %>% lazy_dt() %>% select(cruiseseriescode) %>% distinct() %>% pull(), "[,]")))
-    rv$all$cruiseseries <- sort(as.integer(rv$all$cruiseseries[rv$all$cruiseseries != "NA"]))
-    
-    if(length(rv$all$cruiseseries) > 0) {
-      names(rv$all$cruiseseries) <- tmpCS[rv$all$cruiseseries]
+    if("gearcategory" %in% names(rv$stnall)) {
+      rv$all$gearcategory <- rv$stnall %>% lazy_dt() %>% select(gearcategory) %>% distinct() %>% pull() %>% sort()
+    } else {
+      rv$all$gearcategory <- character(0)
     }
-       
-    rv$all$icesarea <- rv$stnall %>% lazy_dt() %>% select(icesarea) %>% distinct() %>% pull() %>% sort()
-    rv$all$area <- rv$stnall %>% lazy_dt() %>% select(area) %>% distinct() %>% pull() %>% sort()
+
+    if("cruiseseriescode" %in% names(rv$mission)) {
+      tmpCS <- names(index$cruiseseries)
+      names(tmpCS) <- as.character(index$cruiseseries)
+      rv$all$cruiseseries <- unique(unlist(strsplit(rv$mission %>% lazy_dt() %>% select(cruiseseriescode) %>% distinct() %>% pull(), "[,]")))
+      rv$all$cruiseseries <- sort(as.integer(rv$all$cruiseseries[rv$all$cruiseseries != "NA"]))
+      if(length(rv$all$cruiseseries) > 0) {
+        names(rv$all$cruiseseries) <- tmpCS[as.character(rv$all$cruiseseries)]
+      }
+    } else {
+      rv$all$cruiseseries <- integer(0)
+    }
+
+    if("icesarea" %in% names(rv$stnall)) {
+      rv$all$icesarea <- rv$stnall %>% lazy_dt() %>% select(icesarea) %>% distinct() %>% pull() %>% sort()
+    } else {
+      rv$all$icesarea <- character(0)
+    }
+
+    if("area" %in% names(rv$stnall)) {
+      rv$all$area <- rv$stnall %>% lazy_dt() %>% select(area) %>% distinct() %>% pull() %>% sort()
+    } else {
+      rv$all$area <- integer(0)
+    }
   }
   
 }

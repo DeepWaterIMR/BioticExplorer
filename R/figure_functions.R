@@ -798,7 +798,7 @@ lwPlot <- function(data, lwPlotLogSwitch = input$lwPlotLogSwitch) {
       p + 
         scale_x_continuous(paste0("Length (", data$units$length, ")")) +
         scale_y_continuous(paste0("Weight (", data$units$weight, ")")) +
-        geom_path(data = tmp, aes(x = x, y = y), color = "blue", size = 1)
+        geom_path(data = tmp, aes(x = x, y = y), color = "blue", linewidth = 1)
         
         # stat_function(data = data.frame(x = range(data$lwDat$length)), 
         #               aes(x = .data$x),
