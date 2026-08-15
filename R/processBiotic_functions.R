@@ -128,11 +128,18 @@ processBioticFile <- function(file, removeEmpty = TRUE, convertColumns = TRUE, r
     out <- list(mission = msn, stnall = stndat, indall = inddat)
   }
 
+  ### Preserve optional fields required by the explorer
+
+  out$stnall <- ensureStationDepthColumns(out$stnall)
+  out$indall <- ensureStationDepthColumns(out$indall)
+
   ### Remove empty columns to save space
 
   if (removeEmpty) {
     out <- lapply(out, function(k) {
-      k[, which(unlist(lapply(k, function(x) !all(is.na(x))))), with = FALSE]
+      keep <- unlist(lapply(k, function(x) !all(is.na(x)))) |
+        names(k) %in% c("bottomdepthstart", "fishingdepthmin")
+      k[, which(keep), with = FALSE]
     })
   }
 
@@ -175,11 +182,18 @@ processBioticFiles <- function(files, removeEmpty = TRUE, convertColumns = TRUE,
 
   out <- do.call(Map, c(f = rbind, out, fill = TRUE))
   
+  ### Preserve optional fields required by the explorer
+
+  out$stnall <- ensureStationDepthColumns(out$stnall)
+  out$indall <- ensureStationDepthColumns(out$indall)
+
   ### Remove empty columns to save space
   
   if (removeEmpty) {
     out <- lapply(out, function(k) {
-      k[, which(unlist(lapply(k, function(x) !all(is.na(x))))), with = FALSE]
+      keep <- unlist(lapply(k, function(x) !all(is.na(x)))) |
+        names(k) %in% c("bottomdepthstart", "fishingdepthmin")
+      k[, which(keep), with = FALSE]
     })
   }
   
@@ -191,6 +205,24 @@ processBioticFiles <- function(files, removeEmpty = TRUE, convertColumns = TRUE,
   
   out
   
+}
+
+#' @title Ensure optional station-depth fields are available
+#' @description Adds empty station-depth columns when they are absent from an NMD Biotic file.
+#' @param data data.table containing station data.
+#' @return The input data.table with \code{bottomdepthstart} and \code{fishingdepthmin} columns.
+#' @keywords internal
+
+ensureStationDepthColumns <- function(data) {
+
+  depthColumns <- c("bottomdepthstart", "fishingdepthmin")
+  missingColumns <- setdiff(depthColumns, names(data))
+
+  if (length(missingColumns) > 0) {
+    data[, (missingColumns) := NA_real_]
+  }
+
+  data
 }
 
 ## Core data columns list ----

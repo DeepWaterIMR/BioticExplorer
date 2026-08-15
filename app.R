@@ -87,15 +87,17 @@ speciesFigureList <- list("Length-weight" = "lwPlot", "Growth" = "laPlot", "Matu
 
 ## Find the database
 
-if("~/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
-   normalizePath() %>% 
-   duckdb::duckdb(read_only = TRUE) %>% 
-   DBI::dbCanConnect()) {
-  con_db <-"~/IMR_biotic_BES_database/bioticexplorer.duckdb" %>% 
-    normalizePath() %>% 
-    duckdb::duckdb(read_only = TRUE) %>% 
-    DBI::dbConnect()
-  dbFound <- TRUE
+dbPath <- path.expand("~/IMR_biotic_BES_database/bioticexplorer.duckdb")
+
+if (file.exists(dbPath)) {
+  con_db <- tryCatch(
+    DBI::dbConnect(duckdb::duckdb(dbdir = dbPath, read_only = TRUE)),
+    error = function(e) {
+      message("Could not connect to the local database: ", conditionMessage(e))
+      NULL
+    }
+  )
+  dbFound <- !is.null(con_db)
 }
 
 if(dbFound) {
@@ -911,8 +913,8 @@ server <- shinyServer(function(input, output, session) {
     }
     )
     
-    rv$stnall <- rv$inputData$stnall
-    rv$indall <- rv$inputData$indall
+    rv$stnall <- ensureStationDepthColumns(rv$inputData$stnall)
+    rv$indall <- ensureStationDepthColumns(rv$inputData$indall)
     rv$mission <- rv$inputData$mission
     
     obsPopulatePanel()

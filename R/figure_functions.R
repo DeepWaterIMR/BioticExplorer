@@ -976,18 +976,33 @@ laPlot <- function(data, laPlotSexSwitch, growthModelSwitch, forceZeroGroupLengt
 #' @import ggplot2
 l50Plot <- function(data) {
   
-  modF <- glm(maturity ~ length, data = data$l50Dat[data$l50Dat$sex == "Female",], family = binomial(link = "logit"))
-  modM <- glm(maturity ~ length, data = data$l50Dat[data$l50Dat$sex == "Male",], family = binomial(link = "logit"))
+  modF <- suppressWarnings(glm(maturity ~ length, data = data$l50Dat[data$l50Dat$sex == "Female",], family = binomial(link = "logit")))
+  modM <- suppressWarnings(glm(maturity ~ length, data = data$l50Dat[data$l50Dat$sex == "Male",], family = binomial(link = "logit")))
   
   Fdat <- unlogit(0.5, modF)
   Fdat$sex <- "Female"
   Mdat <- unlogit(0.5, modM)
   Mdat$sex <- "Male"
   modDat <- rbind(Fdat, Mdat)
+
+  predictionLength <- seq(min(data$l50Dat$length), max(data$l50Dat$length), length.out = 100)
+  predictionDat <- rbind(
+    data.frame(length = predictionLength, maturity = stats::predict(modF, newdata = data.frame(length = predictionLength), type = "response"), sex = "Female"),
+    data.frame(length = predictionLength, maturity = stats::predict(modM, newdata = data.frame(length = predictionLength), type = "response"), sex = "Male")
+  )
+
+  formatCi <- function(x) {
+    if (is.finite(x$ci.min) && is.finite(x$ci.max)) {
+      paste0("95% confidence intervals (", x$ci.method, "): ",
+             round(x$ci.min, 3), " - ", round(x$ci.max, 3))
+    } else {
+      "95% confidence interval unavailable because the model profile could not be estimated"
+    }
+  }
   
   ### Plot
   
-  Plot <- suppressMessages({
+  Plot <- suppressWarnings(suppressMessages({
     
     ggplot(data$l50Dat, aes(x = length, y = maturity, shape = sex)) + 
       geom_point() + 
@@ -1000,8 +1015,7 @@ l50Plot <- function(data) {
       geom_text(data = modDat, 
                 aes(x = mean, y = -0.03, label = paste(round(mean, 2), data$units$length),
                     color = sex), size = 3) +
-      stat_smooth(aes(color = sex), method = "glm", formula = y ~ x,
-                  method.args = list(family = "binomial")) +
+      geom_line(data = predictionDat, aes(x = length, y = maturity, color = sex)) +
       xlab(paste0("Total length (", data$units$length, ")")) +
       ylab("Maturity") + 
       scale_color_manual("Sex", values = c(ColorPalette[4], ColorPalette[1])) +
@@ -1010,15 +1024,15 @@ l50Plot <- function(data) {
       guides(color=guide_legend(override.aes=list(fill=NA))) + 
       theme(legend.position = c(0.9, 0.25), 
             legend.background = element_blank(), legend.key = element_blank())
-  })
+  }))
   
   ### Text
   
   Text <- paste0(
     "50% maturity at length (L50) based on logit regressions and assuming maturitystage >= 2 as mature:",
-    "\n\n Females: ", round(modDat[modDat$sex == "Female", "mean"], 3), " ", data$units$length, ". 95% confidence intervals: ", round(modDat[modDat$sex == "Female", "ci.min"], 3), " - ", round(modDat[modDat$sex == "Female", "ci.max"], 3),
+    "\n\n Females: ", round(modDat[modDat$sex == "Female", "mean"], 3), " ", data$units$length, ". ", formatCi(modDat[modDat$sex == "Female", ]),
     "\n  Number of specimens: ", nrow(data$l50Dat[data$l50Dat$sex == "Female",]),
-    "\n\n Males: ", round(modDat[modDat$sex == "Male", "mean"], 3), " ", data$units$length, ". 95% confidence intervals: ", round(modDat[modDat$sex == "Male", "ci.min"], 3), " - ", round(modDat[modDat$sex == "Male", "ci.max"], 3),
+    "\n\n Males: ", round(modDat[modDat$sex == "Male", "mean"], 3), " ", data$units$length, ". ", formatCi(modDat[modDat$sex == "Male", ]),
     "\n  Number of specimens: ", nrow(data$l50Dat[data$l50Dat$sex == "Male",])
   )
   

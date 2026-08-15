@@ -69,16 +69,26 @@ loadingLogo <- function(href, src, loadingsrc, height = NULL, width = NULL, alt 
 #' @title Back-transform predictor variables from a logit model
 #' @param p numeric. Probability at which to back-transform (e.g. \code{0.5} for L50).
 #' @param model a fitted \code{glm} object with a binomial family and a single predictor.
-#' @return Returns a data frame with columns \code{mean}, \code{ci.min}, and \code{ci.max} giving the back-transformed predictor value and 95\% confidence interval.
+#' @return Returns a data frame with columns \code{mean}, \code{ci.min}, \code{ci.max}, and \code{ci.method} giving the back-transformed predictor value and 95\% confidence interval.
 unlogit <- function(p, model) {
-  mean <- unname((log(p/(1 - p)) - coef(model)[1])/coef(model)[2])
-  
-  tmp.cis <- suppressMessages(confint(model))
-  
-  ci.max <- unname((log(p/(1 - p)) - tmp.cis[1])/tmp.cis[2])
-  ci.min <- unname((log(p/(1 - p)) - tmp.cis[3])/tmp.cis[4])
-  
-  data.frame(mean = mean, ci.min = ci.min, ci.max = ci.max)
+  logit <- log(p / (1 - p))
+  coefficients <- stats::coef(model)
+  mean <- unname((logit - coefficients[1]) / coefficients[2])
+
+  profileCis <- tryCatch(
+    suppressWarnings(suppressMessages(stats::confint(model))),
+    error = function(e) NULL
+  )
+
+  if (!is.matrix(profileCis) || !all(is.finite(profileCis))) {
+    return(data.frame(mean = mean, ci.min = NA_real_, ci.max = NA_real_,
+                      ci.method = "unavailable"))
+  }
+
+  ci.values <- unname((logit - profileCis[1, ]) / profileCis[2, ])
+
+  data.frame(mean = mean, ci.min = min(ci.values), ci.max = max(ci.values),
+             ci.method = "profile likelihood")
 }
 
 
