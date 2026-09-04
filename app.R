@@ -12,11 +12,12 @@ if (Sys.info()["sysname"] == "Windows") {
 
 if(Sys.getenv(c("SERVER_MODE"))=="") {
   dbHost <- "localhost"
-  dbIndexPath <- "~/IMR_biotic_BES_database/dbIndex.rda"
 } else {
   dbHost <- "dbserver"
-  dbIndexPath <- "/Documents/IMR_biotic_BES_database/dbIndex.rda"
 }
+
+## The database and index paths are resolved below, once the helper functions have been
+## sourced.
 
 dbFound <- FALSE
 
@@ -86,10 +87,24 @@ individualOverviewFigureList <- list("Length distribution of species" = "indLeng
 speciesFigureList <- list("Length-weight" = "lwPlot", "Growth" = "laPlot", "Maturity" = "l50Plot", "Sex ratio map" = "sexRatioMap", "Length distribution map" = "sizeDistributionMap", "Length/sex disrtibution" = "lengthDistributionPlot", "Length/stage distribution" = "stageDistributionPlot")
 
 ## Find the database
+##
+## The database is compiled by BioticExplorerServer, whose default location is
+## ~/IMR_biotic_BES_database on macOS and Linux but %USERPROFILE%\IMR_biotic_BES_database
+## on Windows, where R expands ~ through the Documents folder that OneDrive's Known Folder
+## Move commonly redirects. findBesDatabase() checks both locations, and the BES_DB_PATH
+## environment variable for databases installed elsewhere.
 
-dbPath <- path.expand("~/IMR_biotic_BES_database/bioticexplorer.duckdb")
+if(dbHost == "dbserver") {
+  dbSearchPaths <- "/Documents/IMR_biotic_BES_database/bioticexplorer.duckdb"
+  dbPath <- if(file.exists(dbSearchPaths)) dbSearchPaths else NULL
+} else {
+  dbSearchPaths <- file.path(besDbPathCandidates(), "bioticexplorer.duckdb")
+  dbPath <- findBesDatabase()
+}
 
-if (file.exists(dbPath)) {
+dbIndexPath <- if(is.null(dbPath)) NULL else file.path(dirname(dbPath), "dbIndex.rda")
+
+if (!is.null(dbPath)) {
   con_db <- tryCatch(
     DBI::dbConnect(duckdb::duckdb(dbdir = dbPath, read_only = TRUE)),
     error = function(e) {
@@ -101,13 +116,17 @@ if (file.exists(dbPath)) {
 }
 
 if(dbFound) {
-  message("Database found. Enabling server version.")
+  message("Database found at ", dbPath, ". Enabling server version.")
   if(file.exists(dbIndexPath)) {
     load(dbIndexPath, envir = .GlobalEnv)
     message("dbIndexPath found. Loading the database index.")
   }
 } else {
-  message("Database not found. Enabling desktop version.")
+  message(
+    "Database not found. Enabling desktop version. Looked in: ",
+    paste(dbSearchPaths, collapse = ", "),
+    ". Set the BES_DB_PATH environment variable if the database is stored elsewhere."
+  )
 }
 
 ##............

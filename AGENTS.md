@@ -7,7 +7,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 **BioticExplorer** (v0.7.1) is a Shiny web application for exploring and analyzing IMR (Institute of Marine Research) NMD Biotic data. It operates in two modes:
 
 - **File mode**: Loads local NMD Biotic v3 XML files directly (no external dependencies)
-- **Database mode**: Connects to a DuckDB database at `~/IMR_biotic_BES_database/bioticexplorer.duckdb`, which is created and maintained by the companion package **BioticExplorerServer**. Database mode is auto-detected at startup.
+- **Database mode**: Connects to a DuckDB database created and maintained by the companion package **BioticExplorerServer**. Database mode is auto-detected at startup by `findBesDatabase()` in `R/other_functions.R`, which checks `$BES_DB_PATH`, then `~/IMR_biotic_BES_database/bioticexplorer.duckdb`, and on Windows also `%USERPROFILE%\IMR_biotic_BES_database\bioticexplorer.duckdb` (the current BioticExplorerServer and BAIT default, because R expands `~` through the OneDrive-redirected Documents folder there).
 
 ## Running the App
 

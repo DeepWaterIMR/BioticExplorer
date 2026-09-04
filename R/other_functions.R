@@ -118,3 +118,72 @@ prettyDec <- function(dt) {
   for (j in cols) suppressWarnings(set(dt, j = j, value = as.numeric(format(dt[[j]]))))
   return(dt)
 }
+
+## Database location ----
+
+#' @title Plausible locations of the BioticExplorerServer database
+#' @param folder Character string giving the name of the database folder inside the user's
+#'   home directory.
+#' @return Character vector of unique absolute paths, most likely first. The folders are
+#'   not guaranteed to exist.
+#' @details On macOS and Linux there is one candidate, \code{~/IMR_biotic_BES_database}. On
+#'   Windows, R expands \code{~} through the "personal"/Documents special folder, which
+#'   OneDrive's Known Folder Move frequently redirects into a synchronized
+#'   \code{OneDrive - <Organization>\\Documents} folder. BioticExplorerServer (>= 0.8.7)
+#'   and BAIT therefore install to \code{\%USERPROFILE\%\\IMR_biotic_BES_database} instead,
+#'   but databases compiled by earlier versions may still sit under Documents. Both are
+#'   returned on Windows, the current default first. Mirrors
+#'   \code{BioticExplorerServer::dbPathCandidates()}, duplicated here because the app does
+#'   not depend on that package.
+#' @author Mikko Vihtakari (Institute of Marine Research)
+
+besDbPathCandidates <- function(folder = "IMR_biotic_BES_database") {
+  candidates <- path.expand(file.path("~", folder))
+  
+  if (.Platform$OS.type == "windows") {
+    profile <- Sys.getenv("USERPROFILE")
+    
+    if (nzchar(profile)) {
+      candidates <- c(
+        file.path(normalizePath(profile, winslash = "/", mustWork = FALSE), folder),
+        candidates
+      )
+    }
+  }
+  
+  unique(candidates)
+}
+
+#' @title Locate the BioticExplorerServer database
+#' @param dbName Character string giving the name of the database file without the
+#'   \code{.duckdb} extension.
+#' @inheritParams besDbPathCandidates
+#' @return Character string giving the path to an existing \code{.duckdb} file, or
+#'   \code{NULL} if no database was found.
+#' @details Checks the \code{BES_DB_PATH} environment variable first, which may point
+#'   either at a \code{.duckdb} file or at the folder containing it, and then each of
+#'   \code{\link{besDbPathCandidates}} in order.
+#' @author Mikko Vihtakari (Institute of Marine Research)
+
+findBesDatabase <- function(dbName = "bioticexplorer",
+                            folder = "IMR_biotic_BES_database") {
+  dbFile <- paste0(dbName, ".duckdb")
+  override <- path.expand(Sys.getenv("BES_DB_PATH"))
+  
+  if (nzchar(override)) {
+    if (dir.exists(override)) override <- file.path(override, dbFile)
+    
+    if (file.exists(override)) {
+      return(normalizePath(override, winslash = "/", mustWork = FALSE))
+    }
+    
+    message("BES_DB_PATH is set but no database was found there: ", override)
+  }
+  
+  candidates <- file.path(besDbPathCandidates(folder = folder), dbFile)
+  found <- candidates[file.exists(candidates)]
+  
+  if (length(found) == 0) return(NULL)
+  
+  normalizePath(found[1], winslash = "/", mustWork = FALSE)
+}

@@ -12,10 +12,16 @@ Biotic XML files and the IMR Biotic database. It operates in two modes:
   computer, no database required.
 - **Database mode** — connect to a DuckDB database compiled by
   [BioticExplorerServer](https://github.com/DeepWaterIMR/BioticExplorerServer)
-  to query the full IMR Biotic dataset. The database must be installed
-  to the [default location
-  (`~/IMR_biotic_BES_database`)](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database)
-  for BioticExplorer to detect it automatically at startup.
+  to query the full IMR Biotic dataset. BioticExplorer detects the
+  database automatically at startup when it sits in the [default
+  location](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database):
+  `~/IMR_biotic_BES_database` on macOS and Linux,
+  `%USERPROFILE%\IMR_biotic_BES_database` on Windows. On Windows the
+  Documents folder (where R's `~` expansion lands, often redirected into
+  OneDrive) is checked as well, so databases compiled by
+  BioticExplorerServer \< 0.8.7 are still found. If you keep the database
+  somewhere else, set the `BES_DB_PATH` environment variable to that
+  folder before starting the app.
 
 ## The server version
 
