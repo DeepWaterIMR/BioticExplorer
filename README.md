@@ -258,11 +258,28 @@ The app automatically installs the following packages on first run:
 
 ## News
 
-2026-10-14 Bumped to version 0.8.3. L50 confidence intervals are now
-estimated using the delta method (matching `MASS::dose.p()` and
-ggFishPlots), accounting for the covariance between intercept and slope.
-The previous approach combined separate profile-likelihood limits of the
-coefficients, producing too-wide intervals.
+Development versions 0.8.1–0.8.3. Changes since 0.8.0 that will be
+released as version 0.9.0:
+
+- 0.8.1 (2026-08-15): The app no longer fails at startup when the
+  database file is missing or cannot be opened; it falls back to file
+  mode.
+- 0.8.1 (2026-08-15): NMD Biotic files without station depth fields
+  (`bottomdepthstart`, `fishingdepthmin`) now load; the columns are
+  added as empty instead of causing errors downstream.
+- 0.8.1 (2026-08-15): The L50 plot no longer fails when confidence
+  intervals cannot be estimated; the text reports the interval as
+  unavailable, and the maturity curve is drawn from the fitted model.
+- 0.8.2 (2026-09-04): The database is found at startup in both Windows
+  locations (`%USERPROFILE%\IMR_biotic_BES_database`, the
+  BioticExplorerServer \>= 0.8.7 and BAIT default, and the Documents
+  folder used by older versions). A custom location can be set with the
+  `BES_DB_PATH` environment variable.
+- 0.8.3 (2026-10-14): L50 confidence intervals are now estimated using
+  the delta method (matching `MASS::dose.p()` and ggFishPlots),
+  accounting for the covariance between intercept and slope. The
+  previous approach combined separate profile-likelihood limits of the
+  coefficients, producing too-wide intervals.
 
 2026-05-19 Bumped to version 0.8.0. Introduced `all.x = TRUE` merge for
 stations without catch (empty-catch stations now retained with
