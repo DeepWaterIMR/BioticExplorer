@@ -2,7 +2,7 @@
 # Biotic Explorer
 
 **A Shiny app to explore Biotic data within the Institute of Marine
-Research Norway (IMR) database. Version 0.8.0, 2026-05-19.**
+Research Norway (IMR) database. Version 0.8.3, 2026-10-14.**
 
 **Biotic Explorer** is a [Shiny](https://shiny.rstudio.com/) app for
 examining and manipulating Norwegian Maritime Data Center (NMD) standard
@@ -17,11 +17,11 @@ Biotic XML files and the IMR Biotic database. It operates in two modes:
   location](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database):
   `~/IMR_biotic_BES_database` on macOS and Linux,
   `%USERPROFILE%\IMR_biotic_BES_database` on Windows. On Windows the
-  Documents folder (where R's `~` expansion lands, often redirected into
+  Documents folder (where R’s `~` expansion lands, often redirected into
   OneDrive) is checked as well, so databases compiled by
-  BioticExplorerServer \< 0.8.7 are still found. If you keep the database
-  somewhere else, set the `BES_DB_PATH` environment variable to that
-  folder before starting the app.
+  BioticExplorerServer \< 0.8.7 are still found. If you keep the
+  database somewhere else, set the `BES_DB_PATH` environment variable to
+  that folder before starting the app.
 
 ## The server version
 
@@ -257,6 +257,12 @@ The app automatically installs the following packages on first run:
   Used to install packages not available on CRAN.
 
 ## News
+
+2026-10-14 Bumped to version 0.8.3. L50 confidence intervals are now
+estimated using the delta method (matching `MASS::dose.p()` and
+ggFishPlots), accounting for the covariance between intercept and slope.
+The previous approach combined separate profile-likelihood limits of the
+coefficients, producing too-wide intervals.
 
 2026-05-19 Bumped to version 0.8.0. Introduced `all.x = TRUE` merge for
 stations without catch (empty-catch stations now retained with

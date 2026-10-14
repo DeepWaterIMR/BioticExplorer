@@ -151,6 +151,8 @@ The app automatically installs the following packages on first run:
 
 ## News
 
+2026-10-14 Bumped to version 0.8.3. L50 confidence intervals are now estimated using the delta method (matching `MASS::dose.p()` and ggFishPlots), accounting for the covariance between intercept and slope. The previous approach combined separate profile-likelihood limits of the coefficients, producing too-wide intervals.
+
 2026-05-19 Bumped to version 0.8.0. Introduced `all.x = TRUE` merge for stations without catch (empty-catch stations now retained with `commonname = NA`). Bug fixes and completed figure download. Fixed download format detection, file-mode mission type filter, database-mode column existence guards, cruise series label lookup, and several smaller issues. All figure types in Download → Figures are now fully functional. Git repository moved to [DeepWaterIMR](https://github.com/DeepWaterIMR/BioticExplorer).
 
 2025-01-21 Migrated BioticExplorer to [DuckDB](https://duckdb.org/docs/api/r.html). The app now works on all commonly used operating systems.
