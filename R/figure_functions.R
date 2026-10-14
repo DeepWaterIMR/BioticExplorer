@@ -996,7 +996,7 @@ l50Plot <- function(data) {
       paste0("95% confidence intervals (", x$ci.method, "): ",
              round(x$ci.min, 3), " - ", round(x$ci.max, 3))
     } else {
-      "95% confidence interval unavailable because the model profile could not be estimated"
+      "95% confidence interval unavailable because the model covariance matrix could not be estimated"
     }
   }
   

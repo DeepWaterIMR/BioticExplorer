@@ -72,23 +72,23 @@ loadingLogo <- function(href, src, loadingsrc, height = NULL, width = NULL, alt 
 #' @return Returns a data frame with columns \code{mean}, \code{ci.min}, \code{ci.max}, and \code{ci.method} giving the back-transformed predictor value and 95\% confidence interval.
 unlogit <- function(p, model) {
   logit <- log(p / (1 - p))
-  coefficients <- stats::coef(model)
-  mean <- unname((logit - coefficients[1]) / coefficients[2])
+  b <- unname(stats::coef(model)[1:2])
+  mean <- (logit - b[1]) / b[2]
 
-  profileCis <- tryCatch(
-    suppressWarnings(suppressMessages(stats::confint(model))),
-    error = function(e) NULL
-  )
+  V <- tryCatch(unname(stats::vcov(model)[1:2, 1:2]), error = function(e) NULL)
 
-  if (!is.matrix(profileCis) || !all(is.finite(profileCis))) {
+  if (!is.matrix(V) || !all(is.finite(V)) || !all(is.finite(b))) {
     return(data.frame(mean = mean, ci.min = NA_real_, ci.max = NA_real_,
                       ci.method = "unavailable"))
   }
 
-  ci.values <- unname((logit - profileCis[1, ]) / profileCis[2, ])
+  # Delta method: accounts for the intercept-slope covariance (matches MASS::dose.p)
+  grad <- c(-1 / b[2], -mean / b[2])
+  se <- sqrt(as.numeric(t(grad) %*% V %*% grad))
+  z <- stats::qnorm(0.975)
 
-  data.frame(mean = mean, ci.min = min(ci.values), ci.max = max(ci.values),
-             ci.method = "profile likelihood")
+  data.frame(mean = mean, ci.min = mean - z * se, ci.max = mean + z * se,
+             ci.method = "delta method")
 }
 
 
