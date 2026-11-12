@@ -658,7 +658,7 @@ individualFigureData <- function(indall, indSpecies = input$indSpecies, lengthUn
     
     lwDat <- tmpBase[!is.na(length) & !is.na(individualweight),]
     lwDat$weightMod <- log(lwDat$individualweight*1000)
-    lwDat$lengthMod <- log(lwDat$length*100)
+    lwDat$lengthMod <- log(round(lwDat$length*100, 6))
     
     lwMod <- lm(weightMod ~ lengthMod, 
                 data = lwDat[!is.infinite(lengthMod) & !is.infinite(weightMod)]
@@ -666,8 +666,8 @@ individualFigureData <- function(indall, indSpecies = input$indSpecies, lengthUn
     lwModA <- unname(exp(coef(lwMod)[1]))
     lwModB <- unname(coef(lwMod)[2])
     
-    if(lengthUnit == "cm") lwDat$length <- lwDat$length*100
-    if(lengthUnit == "mm") lwDat$length <- lwDat$length*1000
+    if(lengthUnit == "cm") lwDat$length <- round(lwDat$length*100, 6)
+    if(lengthUnit == "mm") lwDat$length <- round(lwDat$length*1000, 6)
     if(weightUnit == "g") lwDat$individualweight <- lwDat$individualweight*1000
     
     lwDat$weightModTrans <- log(lwDat$individualweight)
@@ -688,8 +688,8 @@ individualFigureData <- function(indall, indSpecies = input$indSpecies, lengthUn
   
   ## Transform tmpBase units (untransformed needed above)
   
-  if(lengthUnit == "cm") tmpBase$length <- tmpBase$length*100
-  if(lengthUnit == "mm") tmpBase$length <- tmpBase$length*1000
+  if(lengthUnit == "cm") tmpBase$length <- round(tmpBase$length*100, 6)
+  if(lengthUnit == "mm") tmpBase$length <- round(tmpBase$length*1000, 6)
   if(weightUnit == "g") tmpBase$individualweight <- tmpBase$individualweight*1000
   
   ## Length-age data
