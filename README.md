@@ -2,7 +2,7 @@
 # Biotic Explorer
 
 **A Shiny app to explore Biotic data within the Institute of Marine
-Research Norway (IMR) database. Version 0.8.3, 2026-10-14.**
+Research Norway (IMR) database. Version 0.8.5, 2026-11-20.**
 
 **Biotic Explorer** is a [Shiny](https://shiny.rstudio.com/) app for
 examining and manipulating Norwegian Maritime Data Center (NMD) standard
@@ -15,13 +15,14 @@ Biotic XML files and the IMR Biotic database. It operates in two modes:
   to query the full IMR Biotic dataset. BioticExplorer detects the
   database automatically at startup when it sits in the [default
   location](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database):
-  `~/IMR_biotic_BES_database` on macOS and Linux,
-  `%USERPROFILE%\IMR_biotic_BES_database` on Windows. On Windows the
-  Documents folder (where R’s `~` expansion lands, often redirected into
-  OneDrive) is checked as well, so databases compiled by
-  BioticExplorerServer \< 0.8.7 are still found. If you keep the
-  database somewhere else, set the `BES_DB_PATH` environment variable to
-  that folder before starting the app.
+  `~/Fiskwise_data/IMR_biotic_BES_database` on macOS and Linux,
+  `%USERPROFILE%\Fiskwise_data\IMR_biotic_BES_database` on Windows.
+  Databases in the legacy location `~/IMR_biotic_BES_database`
+  (BioticExplorerServer \< 0.8.10) are found as well, and on Windows so
+  is the Documents folder (where R’s `~` expansion lands, often
+  redirected into OneDrive) used by BioticExplorerServer \< 0.8.7. If
+  you keep the database somewhere else, set the `BES_DB_PATH`
+  environment variable to that folder before starting the app.
 
 ## The server version
 
@@ -258,7 +259,7 @@ The app automatically installs the following packages on first run:
 
 ## News
 
-Development versions 0.8.1–0.8.3. Changes since 0.8.0 that will be
+Development versions 0.8.1–0.8.5. Changes since 0.8.0 that will be
 released as version 0.9.0:
 
 - 0.8.1 (2026-08-15): The app no longer fails at startup when the
@@ -280,6 +281,10 @@ released as version 0.9.0:
   accounting for the covariance between intercept and slope. The
   previous approach combined separate profile-likelihood limits of the
   coefficients, producing too-wide intervals.
+- 0.8.5 (2026-11-20): The database is found in the shared Fiskwise data
+  folder `~/Fiskwise_data/IMR_biotic_BES_database`, the
+  BioticExplorerServer \>= 0.8.10 and BAIT default, as well as in the
+  legacy `~/IMR_biotic_BES_database`.
 
 2026-05-19 Bumped to version 0.8.0. Introduced `all.x = TRUE` merge for
 stations without catch (empty-catch stations now retained with

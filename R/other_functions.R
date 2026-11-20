@@ -122,36 +122,38 @@ prettyDec <- function(dt) {
 ## Database location ----
 
 #' @title Plausible locations of the BioticExplorerServer database
-#' @param folder Character string giving the name of the database folder inside the user's
-#'   home directory.
+#' @param folder Character string giving the name of the database folder.
+#' @param root Character string giving the shared data folder inside the user's home
+#'   directory that holds \code{folder}.
 #' @return Character vector of unique absolute paths, most likely first. The folders are
 #'   not guaranteed to exist.
-#' @details On macOS and Linux there is one candidate, \code{~/IMR_biotic_BES_database}. On
-#'   Windows, R expands \code{~} through the "personal"/Documents special folder, which
-#'   OneDrive's Known Folder Move frequently redirects into a synchronized
-#'   \code{OneDrive - <Organization>\\Documents} folder. BioticExplorerServer (>= 0.8.7)
-#'   and BAIT therefore install to \code{\%USERPROFILE\%\\IMR_biotic_BES_database} instead,
-#'   but databases compiled by earlier versions may still sit under Documents. Both are
-#'   returned on Windows, the current default first. Mirrors
+#' @details The current default, \code{~/Fiskwise_data/IMR_biotic_BES_database}
+#'   (BioticExplorerServer >= 0.8.10 and BAIT), comes first, followed by the legacy
+#'   location \code{~/IMR_biotic_BES_database}. On Windows, R expands \code{~} through the
+#'   "personal"/Documents special folder, which OneDrive's Known Folder Move frequently
+#'   redirects into a synchronized folder, so BioticExplorerServer (>= 0.8.7) and BAIT use
+#'   \code{\%USERPROFILE\%} as the home folder there. Each location is therefore listed
+#'   under \code{\%USERPROFILE\%} and under raw \code{~} expansion on Windows. Mirrors
 #'   \code{BioticExplorerServer::dbPathCandidates()}, duplicated here because the app does
 #'   not depend on that package.
+#' @section AI assistance:
+#' Written with Claude Opus 5.5 (Anthropic); reviewed in full by Claude Opus 5.5
+#' (Anthropic), 2026-11-20.
 #' @author Mikko Vihtakari (Institute of Marine Research)
 
-besDbPathCandidates <- function(folder = "IMR_biotic_BES_database") {
-  candidates <- path.expand(file.path("~", folder))
+besDbPathCandidates <- function(folder = "IMR_biotic_BES_database",
+                                root = "Fiskwise_data") {
+  homes <- path.expand("~")
   
   if (.Platform$OS.type == "windows") {
     profile <- Sys.getenv("USERPROFILE")
     
     if (nzchar(profile)) {
-      candidates <- c(
-        file.path(normalizePath(profile, winslash = "/", mustWork = FALSE), folder),
-        candidates
-      )
+      homes <- c(normalizePath(profile, winslash = "/", mustWork = FALSE), homes)
     }
   }
   
-  unique(candidates)
+  unique(c(file.path(homes, root, folder), file.path(homes, folder)))
 }
 
 #' @title Locate the BioticExplorerServer database
@@ -166,7 +168,8 @@ besDbPathCandidates <- function(folder = "IMR_biotic_BES_database") {
 #' @author Mikko Vihtakari (Institute of Marine Research)
 
 findBesDatabase <- function(dbName = "bioticexplorer",
-                            folder = "IMR_biotic_BES_database") {
+                            folder = "IMR_biotic_BES_database",
+                            root = "Fiskwise_data") {
   dbFile <- paste0(dbName, ".duckdb")
   override <- path.expand(Sys.getenv("BES_DB_PATH"))
   
@@ -180,7 +183,7 @@ findBesDatabase <- function(dbName = "bioticexplorer",
     message("BES_DB_PATH is set but no database was found there: ", override)
   }
   
-  candidates <- file.path(besDbPathCandidates(folder = folder), dbFile)
+  candidates <- file.path(besDbPathCandidates(folder = folder, root = root), dbFile)
   found <- candidates[file.exists(candidates)]
   
   if (length(found) == 0) return(NULL)

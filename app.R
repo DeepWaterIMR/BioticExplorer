@@ -89,10 +89,10 @@ speciesFigureList <- list("Length-weight" = "lwPlot", "Growth" = "laPlot", "Matu
 ## Find the database
 ##
 ## The database is compiled by BioticExplorerServer, whose default location is
-## ~/IMR_biotic_BES_database on macOS and Linux but %USERPROFILE%\IMR_biotic_BES_database
-## on Windows, where R expands ~ through the Documents folder that OneDrive's Known Folder
-## Move commonly redirects. findBesDatabase() checks both locations, and the BES_DB_PATH
-## environment variable for databases installed elsewhere.
+## ~/Fiskwise_data/IMR_biotic_BES_database (on Windows under %USERPROFILE%, because R
+## expands ~ through the Documents folder that OneDrive's Known Folder Move commonly
+## redirects). findBesDatabase() also checks the legacy ~/IMR_biotic_BES_database and the
+## BES_DB_PATH environment variable for databases installed elsewhere.
 
 if(dbHost == "dbserver") {
   dbSearchPaths <- "/Documents/IMR_biotic_BES_database/bioticexplorer.duckdb"
