@@ -128,7 +128,7 @@ prettyDec <- function(dt) {
 #' @return Character vector of unique absolute paths, most likely first. The folders are
 #'   not guaranteed to exist.
 #' @details The current default, \code{~/Fiskwise_data/IMR_biotic_BES_database}
-#'   (BioticExplorerServer >= 0.8.10 and BAIT), comes first, followed by the legacy
+#'   (BioticExplorerServer >= 0.8.14 and BAIT), comes first, followed by the legacy
 #'   location \code{~/IMR_biotic_BES_database}. On Windows, R expands \code{~} through the
 #'   "personal"/Documents special folder, which OneDrive's Known Folder Move frequently
 #'   redirects into a synchronized folder, so BioticExplorerServer (>= 0.8.7) and BAIT use

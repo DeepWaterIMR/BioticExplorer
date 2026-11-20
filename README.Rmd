@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 **Biotic Explorer** is a [Shiny](https://shiny.rstudio.com/) app for examining and manipulating Norwegian Maritime Data Center (NMD) standard Biotic XML files and the IMR Biotic database. It operates in two modes:
 
 - **File mode** — open local NMD Biotic v3 XML files directly from your computer, no database required.
-- **Database mode** — connect to a DuckDB database compiled by [BioticExplorerServer](https://github.com/DeepWaterIMR/BioticExplorerServer) to query the full IMR Biotic dataset. BioticExplorer detects the database automatically at startup when it sits in the [default location](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database): `~/Fiskwise_data/IMR_biotic_BES_database` on macOS and Linux, `%USERPROFILE%\Fiskwise_data\IMR_biotic_BES_database` on Windows. Databases in the legacy location `~/IMR_biotic_BES_database` (BioticExplorerServer < 0.8.10) are found as well, and on Windows so is the Documents folder (where R's `~` expansion lands, often redirected into OneDrive) used by BioticExplorerServer < 0.8.7. If you keep the database somewhere else, set the `BES_DB_PATH` environment variable to that folder before starting the app.
+- **Database mode** — connect to a DuckDB database compiled by [BioticExplorerServer](https://github.com/DeepWaterIMR/BioticExplorerServer) to query the full IMR Biotic dataset. BioticExplorer detects the database automatically at startup when it sits in the [default location](https://github.com/DeepWaterIMR/BioticExplorerServer?tab=readme-ov-file#download-the-imr-biotic-database): `~/Fiskwise_data/IMR_biotic_BES_database` on macOS and Linux, `%USERPROFILE%\Fiskwise_data\IMR_biotic_BES_database` on Windows. Databases in the legacy location `~/IMR_biotic_BES_database` (BioticExplorerServer < 0.8.14) are found as well, and on Windows so is the Documents folder (where R's `~` expansion lands, often redirected into OneDrive) used by BioticExplorerServer < 0.8.7. If you keep the database somewhere else, set the `BES_DB_PATH` environment variable to that folder before starting the app.
 
 ## The server version
 
@@ -151,14 +151,15 @@ The app automatically installs the following packages on first run:
 
 ## News
 
-Development versions 0.8.1–0.8.5. Changes since 0.8.0 that will be released as version 0.9.0:
+Development versions 0.8.1–0.8.6. Changes since 0.8.0 that will be released as version 0.9.0:
 
 - 0.8.1 (2026-08-15): The app no longer fails at startup when the database file is missing or cannot be opened; it falls back to file mode.
 - 0.8.1 (2026-08-15): NMD Biotic files without station depth fields (`bottomdepthstart`, `fishingdepthmin`) now load; the columns are added as empty instead of causing errors downstream.
 - 0.8.1 (2026-08-15): The L50 plot no longer fails when confidence intervals cannot be estimated; the text reports the interval as unavailable, and the maturity curve is drawn from the fitted model.
 - 0.8.2 (2026-09-04): The database is found at startup in both Windows locations (`%USERPROFILE%\IMR_biotic_BES_database`, the BioticExplorerServer >= 0.8.7 and BAIT default, and the Documents folder used by older versions). A custom location can be set with the `BES_DB_PATH` environment variable.
 - 0.8.3 (2026-10-14): L50 confidence intervals are now estimated using the delta method (matching `MASS::dose.p()` and ggFishPlots), accounting for the covariance between intercept and slope. The previous approach combined separate profile-likelihood limits of the coefficients, producing too-wide intervals.
-- 0.8.5 (2026-11-20): The database is found in the shared Fiskwise data folder `~/Fiskwise_data/IMR_biotic_BES_database`, the BioticExplorerServer >= 0.8.10 and BAIT default, as well as in the legacy `~/IMR_biotic_BES_database`.
+- 0.8.5 (2026-11-20): The database is found in the shared Fiskwise data folder `~/Fiskwise_data/IMR_biotic_BES_database`, the BioticExplorerServer >= 0.8.14 and BAIT default, as well as in the legacy `~/IMR_biotic_BES_database`.
+- 0.8.6 (2026-11-20): Documentation refers to BioticExplorerServer 0.8.14, the version that introduced the Fiskwise_data default.
 
 2026-05-19 Bumped to version 0.8.0. Introduced `all.x = TRUE` merge for stations without catch (empty-catch stations now retained with `commonname = NA`). Bug fixes and completed figure download. Fixed download format detection, file-mode mission type filter, database-mode column existence guards, cruise series label lookup, and several smaller issues. All figure types in Download → Figures are now fully functional. Git repository moved to [DeepWaterIMR](https://github.com/DeepWaterIMR/BioticExplorer).
 

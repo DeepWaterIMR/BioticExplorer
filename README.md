@@ -2,7 +2,7 @@
 # Biotic Explorer
 
 **A Shiny app to explore Biotic data within the Institute of Marine
-Research Norway (IMR) database. Version 0.8.5, 2026-11-20.**
+Research Norway (IMR) database. Version 0.8.6, 2026-11-20.**
 
 **Biotic Explorer** is a [Shiny](https://shiny.rstudio.com/) app for
 examining and manipulating Norwegian Maritime Data Center (NMD) standard
@@ -18,7 +18,7 @@ Biotic XML files and the IMR Biotic database. It operates in two modes:
   `~/Fiskwise_data/IMR_biotic_BES_database` on macOS and Linux,
   `%USERPROFILE%\Fiskwise_data\IMR_biotic_BES_database` on Windows.
   Databases in the legacy location `~/IMR_biotic_BES_database`
-  (BioticExplorerServer \< 0.8.10) are found as well, and on Windows so
+  (BioticExplorerServer \< 0.8.14) are found as well, and on Windows so
   is the Documents folder (where R’s `~` expansion lands, often
   redirected into OneDrive) used by BioticExplorerServer \< 0.8.7. If
   you keep the database somewhere else, set the `BES_DB_PATH`
@@ -259,7 +259,7 @@ The app automatically installs the following packages on first run:
 
 ## News
 
-Development versions 0.8.1–0.8.5. Changes since 0.8.0 that will be
+Development versions 0.8.1–0.8.6. Changes since 0.8.0 that will be
 released as version 0.9.0:
 
 - 0.8.1 (2026-08-15): The app no longer fails at startup when the
@@ -283,8 +283,10 @@ released as version 0.9.0:
   coefficients, producing too-wide intervals.
 - 0.8.5 (2026-11-20): The database is found in the shared Fiskwise data
   folder `~/Fiskwise_data/IMR_biotic_BES_database`, the
-  BioticExplorerServer \>= 0.8.10 and BAIT default, as well as in the
+  BioticExplorerServer \>= 0.8.14 and BAIT default, as well as in the
   legacy `~/IMR_biotic_BES_database`.
+- 0.8.6 (2026-11-20): Documentation refers to BioticExplorerServer
+  0.8.14, the version that introduced the Fiskwise_data default.
 
 2026-05-19 Bumped to version 0.8.0. Introduced `all.x = TRUE` merge for
 stations without catch (empty-catch stations now retained with
